@@ -1,0 +1,16 @@
+{
+  "name": "discord-reminder-bot",
+  "version": "1.0.0",
+  "description": "Discord bot for managing reminders",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "deploy": "node deploy-commands.js"
+  },
+  "dependencies": {
+    "discord-reminder-bot": "file:",
+    "discord.js": "^14.14.1",
+    "dotenv": "^16.4.1",
+    "mongoose": "^8.1.1"
+  }
+}
