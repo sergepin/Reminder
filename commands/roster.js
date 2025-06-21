@@ -51,7 +51,7 @@ module.exports = {
 
         const timeTimestamp = rosterTimestampStr.replace(':f>', ':t>');
 
-        const rosterMessage = `@everyone\n\n📅 ~ ${dateStr}\n⏰ 23:00 Hora Server ~ ${timeTimestamp}(Hora Local)\n📈 ~ [ INFERNO ]\n\nMental: \nPala:\nBoltero:\nBoltero:\nHw:\nSniper:\nHigh Priest:\nHigh Priest:\nLinker:\nLinker:\nClown:\nGypsi:`;
+        const rosterMessage = `@everyone\n\n📅 ~ ${dateStr}\n⏰ 3:00 Hora Server\n📈 ~ [ INFERNO ]\n\nMental: \nPala:\nBoltero:\nBoltero:\nHw:\nSniper:\nHigh Priest:\nHigh Priest:\nLinker:\nLinker:\nClown:\nGypsi:`;
 
         try {
             const reminder = new Reminder({
