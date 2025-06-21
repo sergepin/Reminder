@@ -53,7 +53,7 @@ setInterval(async () => {
                 } else {
                     // Enviar recordatorio normal con GIF
                     const randomPhrase = getRandomPhrase();
-                    let reminderMessage = `${randomPhrase}\n\n**Recordatorio:** ${reminder.message}`;
+                    let reminderMessage = `${randomPhrase}\n\n ${reminder.message} @everyone`;
                     
                     // Si hay un messageId, intentar obtener y mostrar el mensaje original
                     if (reminder.messageId) {
