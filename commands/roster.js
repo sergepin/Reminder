@@ -47,7 +47,7 @@ module.exports = {
             weekday: 'long', 
             day: 'numeric', 
             month: 'long' 
-        });
+        }).replace(/^\w/, c => c.toUpperCase());
 
         const timeTimestamp = rosterTimestampStr.replace(':f>', ':t>');
 
