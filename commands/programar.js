@@ -9,10 +9,6 @@ module.exports = {
         .addStringOption(option =>
             option.setName('timestamp')
                 .setDescription('El timestamp del recordatorio (formato: <t:timestamp:f>)')
-                .setRequired(true))
-        .addStringOption(option =>
-            option.setName('messageid')
-                .setDescription('ID del mensaje a recordar')
                 .setRequired(true)),
 
     async execute(interaction) {
@@ -21,7 +17,6 @@ module.exports = {
         if (!hasPermission) return;
 
         const timestampStr = interaction.options.getString('timestamp');
-        const messageId = interaction.options.getString('messageid');
 
         // Extract timestamp from Discord timestamp format
         const timestampMatch = timestampStr.match(/<t:(\d+):f>/);
@@ -43,20 +38,10 @@ module.exports = {
         }
 
         try {
-            // Verificar que el mensaje existe
-            const originalMessage = await interaction.channel.messages.fetch(messageId);
-            if (!originalMessage) {
-                return interaction.reply({
-                    content: 'No se encontró el mensaje especificado.',
-                    ephemeral: true
-                });
-            }
-
             const reminder = new Reminder({
                 userId: interaction.user.id,
                 channelId: interaction.channelId,
                 message: 'Equipense, nos vemos arriba', // Mensaje fijo
-                messageId: messageId,
                 timestamp: timestamp
             });
 
