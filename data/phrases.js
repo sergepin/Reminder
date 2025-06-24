@@ -1,19 +1,14 @@
 const phrases = [
-    "¡ALISTENSE HIJUEPUTAS!",
-    "¡APURENSE QUE YA EMPIEZA!",
-    "¡DESPIERTEN MAMONES!",
-    "¡MUEVAN EL CULITO!",
-    "¡YA ES HORA, VAGOS!",
-    "¡LEVANTENSE DE LA CAMA!",
-    "¡NO SE DUERMAN, CABRONES!",
+    "¡ALISTENSE!",
+    "¡APURENSE!",
+    "¡DESPIERTEN!",
+    "¡YA ES HORA!",
+    "¡LEVANTENSE!",
     "¡PONGANSE LAS PILAS!",
-    "¡YA ESTÁN TARDANDO!",
     "¡DESPIERTEN, DORMILONES!",
-    "¡MUEVANSE, FLOTADORES!",
-    "¡YA ES HORA DE TRABAJAR!",
-    "¡NO SE HAGAN LOS DORMIDOS!",
-    "¡LEVANTENSE, VAGOS!",
-    "¡APURENSE, LENTOS!"
+    "¡MUEVANSE!",
+    "¡YA ES HORA!",
+    "¡APURENSE!"
 ];
 
 function getRandomPhrase() {
