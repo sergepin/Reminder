@@ -43,12 +43,14 @@ module.exports = {
             });
         }
 
-        // Construcción manual de la fecha en español usando UTC
+        // Ajuste manual para UTC-5 (Colombia)
         const diasSemana = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
         const meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
-        const diaSemana = diasSemana[rosterTimestamp.getUTCDay()];
-        const dia = rosterTimestamp.getUTCDate();
-        const mes = meses[rosterTimestamp.getUTCMonth()];
+        // Restar 5 horas al timestamp para Colombia
+        const colombiaTimestamp = new Date(rosterTimestamp.getTime() - (5 * 60 * 60 * 1000));
+        const diaSemana = diasSemana[colombiaTimestamp.getUTCDay()];
+        const dia = colombiaTimestamp.getUTCDate();
+        const mes = meses[colombiaTimestamp.getUTCMonth()];
         const dateStr = `${diaSemana.charAt(0).toUpperCase() + diaSemana.slice(1)}, ${dia} de ${mes}`;
 
         const timeTimestamp = rosterTimestampStr.replace(':f>', ':t>');
