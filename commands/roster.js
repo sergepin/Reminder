@@ -43,13 +43,13 @@ module.exports = {
             });
         }
 
-        // Usar UTC para evitar problemas de zona horaria
-        const dateStr = rosterTimestamp.toLocaleDateString('es-ES', { 
-            weekday: 'long', 
-            day: 'numeric', 
-            month: 'long',
-            timeZone: 'UTC'
-        }).replace(/^\w/, c => c.toUpperCase());
+        // Construcción manual de la fecha en español usando UTC
+        const diasSemana = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+        const meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+        const diaSemana = diasSemana[rosterTimestamp.getUTCDay()];
+        const dia = rosterTimestamp.getUTCDate();
+        const mes = meses[rosterTimestamp.getUTCMonth()];
+        const dateStr = `${diaSemana.charAt(0).toUpperCase() + diaSemana.slice(1)}, ${dia} de ${mes}`;
 
         const timeTimestamp = rosterTimestampStr.replace(':f>', ':t>');
 
