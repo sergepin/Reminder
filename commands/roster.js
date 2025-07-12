@@ -43,10 +43,12 @@ module.exports = {
             });
         }
 
+        // Usar UTC para evitar problemas de zona horaria
         const dateStr = rosterTimestamp.toLocaleDateString('es-ES', { 
             weekday: 'long', 
             day: 'numeric', 
-            month: 'long' 
+            month: 'long',
+            timeZone: 'UTC'
         }).replace(/^\w/, c => c.toUpperCase());
 
         const timeTimestamp = rosterTimestampStr.replace(':f>', ':t>');
