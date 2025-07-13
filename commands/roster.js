@@ -55,8 +55,7 @@ const DateUtils = {
      */
     validateFutureDate(date, fieldName) {
         const now = new Date();
-        const buffer = 5 * 60 * 1000; // 5 minutos de buffer
-        return date.getTime() > (now.getTime() + buffer);
+        return date.getTime() > now.getTime();
     }
 };
 
@@ -100,7 +99,7 @@ module.exports = {
             // Validar que la fecha de lanzamiento sea en el futuro
             if (!DateUtils.validateFutureDate(launchDate, 'fecha de lanzamiento')) {
                 return interaction.reply({
-                    content: '❌ La fecha de lanzamiento debe ser al menos 5 minutos en el futuro.',
+                    content: '❌ La fecha de lanzamiento debe ser en el futuro.',
                     ephemeral: true
                 });
             }
