@@ -1,6 +1,5 @@
 const { SlashCommandBuilder } = require('discord.js');
 const checkRole = require('../middleware/checkRole');
-const { getRandomGif } = require('../data/gifs');
 const Reminder = require('../models/Reminder');
 
 // Configuración centralizada
@@ -9,7 +8,7 @@ const CONFIG = {
     ROSTER_TIME: '3:00',
     DIAS_SEMANA: ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'],
     MESES: ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'],
-    ROSTER_TEMPLATE: (dateStr, timeTimestamp) => 
+    ROSTER_TEMPLATE: (dateStr) => 
         `@everyone\n\n📅 ~ ${dateStr}\n⏰ ${CONFIG.ROSTER_TIME} Hora Server\n📈 ~ [ INFERNO ]\n\nMental: \nPala:\nBoltero:\nBoltero:\nHw:\nSniper:\nHigh Priest:\nHigh Priest:\nLinker:\nLinker:\nClown:\nGypsi:`
 };
 
@@ -119,11 +118,8 @@ module.exports = {
             const colombiaDate = DateUtils.toColombiaTime(rosterTimestamp);
             const dateStr = DateUtils.formatDateSpanish(colombiaDate);
 
-            // Crear timestamp de tiempo
-            const timeTimestamp = rosterTimestampStr.replace(':f>', ':t>');
-
             // Generar mensaje del roster
-            const rosterMessage = CONFIG.ROSTER_TEMPLATE(dateStr, timeTimestamp);
+            const rosterMessage = CONFIG.ROSTER_TEMPLATE(dateStr);
 
             // Guardar reminder en la base de datos
             const reminder = new Reminder({
