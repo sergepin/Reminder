@@ -1,15 +1,14 @@
 const { SlashCommandBuilder } = require('discord.js');
 const checkRole = require('../middleware/checkRole');
 const Reminder = require('../models/Reminder');
+const getRosterTemplate = require('../templates/rosterTemplate');
 
 // Configuración centralizada
 const CONFIG = {
     TIMEZONE_OFFSET: -5, // UTC-5 para Colombia
-    ROSTER_TIME: '3:00',
     DIAS_SEMANA: ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'],
     MESES: ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'],
-    ROSTER_TEMPLATE: (dateStr) => 
-        `@everyone\n\n📅 ~ ${dateStr}\n⏰ ${CONFIG.ROSTER_TIME} Hora Server\n📈 ~ [ INFERNO ]\n\nMental: \nPala:\nBoltero:\nBoltero:\nHw:\nSniper:\nHigh Priest:\nHigh Priest:\nLinker:\nLinker:\nClown:\nGypsi:`
+    ROSTER_TEMPLATE: () => getRosterTemplate()
 };
 
 // Utilidades para manejo de fechas
@@ -63,10 +62,6 @@ module.exports = {
         .setName('roster')
         .setDescription('Crea un anuncio de roster con timestamp')
         .addStringOption(option =>
-            option.setName('fecharoster')
-                .setDescription('La fecha del roster (formato: <t:timestamp:f>)')
-                .setRequired(true))
-        .addStringOption(option =>
             option.setName('fechalanzar')
                 .setDescription('La fecha en que se lanzará el mensaje (formato: <t:timestamp:f>)')
                 .setRequired(true)),
@@ -77,22 +72,18 @@ module.exports = {
             const hasPermission = await checkRole()(interaction);
             if (!hasPermission) return;
 
-            // Extraer y validar timestamps
-            const rosterTimestampStr = interaction.options.getString('fecharoster');
+            // Extraer y validar timestamp
             const launchTimestampStr = interaction.options.getString('fechalanzar');
-
-            const rosterTimestamp = DateUtils.extractTimestamp(rosterTimestampStr);
             const launchTimestamp = DateUtils.extractTimestamp(launchTimestampStr);
 
-            if (!rosterTimestamp || !launchTimestamp) {
+            if (!launchTimestamp) {
                 return interaction.reply({
                     content: '❌ Formato de timestamp inválido. Usa el formato <t:timestamp:f>',
                     ephemeral: true
                 });
             }
 
-            // Convertir a objetos Date
-            const rosterDate = new Date(rosterTimestamp * 1000);
+            // Convertir a objeto Date
             const launchDate = new Date(launchTimestamp * 1000);
 
             // Validar que la fecha de lanzamiento sea en el futuro
@@ -103,23 +94,8 @@ module.exports = {
                 });
             }
 
-            // Validar que la fecha del roster sea razonable (no más de 1 año en el futuro)
-            const oneYearFromNow = new Date();
-            oneYearFromNow.setFullYear(oneYearFromNow.getFullYear() + 1);
-            
-            if (rosterDate > oneYearFromNow) {
-                return interaction.reply({
-                    content: '❌ La fecha del roster no puede ser más de 1 año en el futuro.',
-                    ephemeral: true
-                });
-            }
-
-            // Procesar fecha para Colombia
-            const colombiaDate = DateUtils.toColombiaTime(rosterTimestamp);
-            const dateStr = DateUtils.formatDateSpanish(colombiaDate);
-
             // Generar mensaje del roster
-            const rosterMessage = CONFIG.ROSTER_TEMPLATE(dateStr);
+            const rosterMessage = CONFIG.ROSTER_TEMPLATE();
 
             // Guardar reminder en la base de datos
             const reminder = new Reminder({
@@ -128,11 +104,7 @@ module.exports = {
                 message: rosterMessage,
                 timestamp: launchDate,
                 messageType: 'roster',
-                metadata: {
-                    rosterDate: rosterDate,
-                    colombiaDate: colombiaDate,
-                    originalTimestamp: rosterTimestamp
-                }
+                metadata: {}
             });
 
             await reminder.save();
@@ -141,8 +113,6 @@ module.exports = {
             const successMessage = [
                 '✅ **Roster programado exitosamente**',
                 '',
-                `📅 **Fecha del roster:** ${dateStr}`,
-                `⏰ **Hora del roster:** ${CONFIG.ROSTER_TIME} Hora Server`,
                 `🚀 **Se lanzará:** <t:${launchTimestamp}:f>`,
                 '',
                 'El mensaje se enviará automáticamente en el momento programado.'

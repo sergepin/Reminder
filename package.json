@@ -5,6 +5,9 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
+    "start:prod": "pm2 start index.js --name \"reminder-bot\"",
+    "stop": "pm2 stop reminder-bot",
+    "restart": "pm2 restart reminder-bot",
     "deploy": "node deploy-commands.js"
   },
   "dependencies": {
