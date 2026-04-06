@@ -9,6 +9,18 @@ const reminderSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    guildId: {
+        type: String,
+        default: null
+    },
+    guildName: {
+        type: String,
+        default: 'Desconocido'
+    },
+    channelName: {
+        type: String,
+        default: 'Desconocido'
+    },
     message: {
         type: String,
         required: true

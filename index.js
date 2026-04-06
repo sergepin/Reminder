@@ -41,42 +41,50 @@ setInterval(async () => {
             timestamp: { $lte: now }
         });
 
-        for (const reminder of dueReminders) {
-            const channel = await client.channels.fetch(reminder.channelId);
-            if (channel) {
-                if (reminder.messageType === 'roster') {
-                    // Enviar mensaje de roster sin GIF
-                    await channel.send({
-                        content: reminder.message,
-                        allowedMentions: { parse: ['everyone'] }
-                    });
-                } else {
-                    // Enviar recordatorio normal con GIF
-                    const randomPhrase = getRandomPhrase();
-                    let reminderMessage = `${randomPhrase}\n\n ${reminder.message} @everyone`;
-                    
-                    // Si hay un messageId, intentar obtener y mostrar el mensaje original
-                    if (reminder.messageId) {
-                        try {
-                            const originalMessage = await channel.messages.fetch(reminder.messageId);
-                            if (originalMessage) {
-                                // Eliminar @everyone del mensaje original
-                                const cleanContent = originalMessage.content.replace(/@everyone\s*/i, '');
-                                reminderMessage += `\n\n**Roster:**\n${cleanContent || '*(mensaje sin contenido)*'}`;
+        if (dueReminders.length > 0) {
+            await Promise.allSettled(dueReminders.map(async (reminder) => {
+                try {
+                    const channel = await client.channels.fetch(reminder.channelId);
+                    if (channel) {
+                        if (reminder.messageType === 'roster') {
+                            // Enviar mensaje de roster sin GIF
+                            await channel.send({
+                                content: reminder.message,
+                                allowedMentions: { parse: ['everyone'] }
+                            });
+                        } else {
+                            // Enviar recordatorio normal con GIF
+                            const randomPhrase = getRandomPhrase();
+                            let reminderMessage = `${randomPhrase}\n\n ${reminder.message} @everyone`;
+                            
+                            // Si hay un messageId, intentar obtener y mostrar el mensaje original
+                            if (reminder.messageId) {
+                                try {
+                                    const originalMessage = await channel.messages.fetch(reminder.messageId);
+                                    if (originalMessage) {
+                                        // Eliminar @everyone del mensaje original
+                                        const cleanContent = originalMessage.content.replace(/@everyone\s*/i, '');
+                                        reminderMessage += `\n\n**Roster:**\n${cleanContent || '*(mensaje sin contenido)*'}`;
+                                    }
+                                } catch (error) {
+                                    console.error('Error fetching original message:', error);
+                                    reminderMessage += '\n\n⚠️ No se pudo acceder al mensaje original.';
+                                }
                             }
-                        } catch (error) {
-                            console.error('Error fetching original message:', error);
-                            reminderMessage += '\n\n⚠️ No se pudo acceder al mensaje original.';
+
+                            // Añadir el enlace del GIF directamente en el contenido para que Discord lo incruste insertándolo al final
+                            reminderMessage += `\n${getRandomGif()}`;
+
+                            await channel.send({
+                                content: reminderMessage
+                            });
                         }
                     }
-
-                    await channel.send({
-                        content: reminderMessage,
-                        files: [getRandomGif()]
-                    });
+                    await reminder.deleteOne();
+                } catch (err) {
+                    console.error('Error procesando un recordatorio específico:', err);
                 }
-            }
-            await reminder.deleteOne();
+            }));
         }
     } catch (error) {
         console.error('Error checking reminders:', error);

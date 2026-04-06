@@ -13,24 +13,27 @@ module.exports = {
         if (!hasPermission) return;
 
         try {
-            const reminders = await Reminder.find({
-                timestamp: { $gt: new Date() }
-            }).sort({ timestamp: 1 });
+            const query = {
+                timestamp: { $gt: new Date() },
+                guildId: interaction.guildId || null
+            };
+
+            const reminders = await Reminder.find(query).sort({ timestamp: 1 });
 
             if (reminders.length === 0) {
                 return interaction.reply({
-                    content: 'No hay recordatorios activos.',
+                    content: 'No hay recordatorios activos en este servidor.',
                     ephemeral: true
                 });
             }
 
             const reminderList = reminders.map(reminder => {
                 const timestamp = Math.floor(reminder.timestamp.getTime() / 1000);
-                return `ID: ${reminder._id}\nFecha: <t:${timestamp}:F> (<t:${timestamp}:R>)\nMensaje ID: ${reminder.messageId}`;
+                return `**ID:** ${reminder._id}\n**Canal:** ${reminder.channelName || '<Desconocido>'}\n**Fecha:** <t:${timestamp}:F> (<t:${timestamp}:R>)`;
             }).join('\n\n');
 
             await interaction.reply({
-                content: `**Recordatorios activos:**\n\n${reminderList}`,
+                content: `**Recordatorios activos en este servidor:**\n\n${reminderList}`,
                 ephemeral: true
             });
         } catch (error) {

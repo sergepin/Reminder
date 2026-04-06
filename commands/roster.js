@@ -101,6 +101,9 @@ module.exports = {
             const reminder = new Reminder({
                 userId: interaction.user.id,
                 channelId: interaction.channelId,
+                guildId: interaction.guildId || null,
+                guildName: interaction.guild?.name || 'DM',
+                channelName: interaction.channel?.name || 'DM',
                 message: rosterMessage,
                 timestamp: launchDate,
                 messageType: 'roster',

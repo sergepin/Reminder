@@ -41,6 +41,9 @@ module.exports = {
             const reminder = new Reminder({
                 userId: interaction.user.id,
                 channelId: interaction.channelId,
+                guildId: interaction.guildId || null,
+                guildName: interaction.guild?.name || 'DM',
+                channelName: interaction.channel?.name || 'DM',
                 message: 'Equipense, nos vemos arriba', // Mensaje fijo
                 timestamp: timestamp
             });
