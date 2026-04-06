@@ -21,6 +21,15 @@ const reminderSchema = new mongoose.Schema({
         type: String,
         default: 'Desconocido'
     },
+    shortId: {
+        type: String,
+        default: () => Math.random().toString(36).substring(2, 7).toUpperCase()
+    },
+    recurrence: {
+        type: String,
+        enum: ['none', 'diario', 'lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo'],
+        default: 'none'
+    },
     message: {
         type: String,
         required: true

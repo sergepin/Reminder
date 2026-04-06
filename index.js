@@ -42,28 +42,37 @@ setInterval(async () => {
         });
 
         if (dueReminders.length > 0) {
+            // Se importa la configuración para leer el role
+            const GuildConfig = require('./models/GuildConfig');
+            
             await Promise.allSettled(dueReminders.map(async (reminder) => {
                 try {
                     const channel = await client.channels.fetch(reminder.channelId);
                     if (channel) {
+                        // Obtener config del servidor
+                        let roleToMention = '@everyone';
+                        if (channel.guild) {
+                            const config = await GuildConfig.findOne({ guildId: channel.guild.id });
+                            if (config) roleToMention = config.roleToMention;
+                        }
+
                         if (reminder.messageType === 'roster') {
-                            // Enviar mensaje de roster sin GIF
+                            // Enviar mensaje de roster con MENCION
+                            const rosterContent = reminder.message.replace(/{{MENTION}}|@everyone/g, roleToMention);
                             await channel.send({
-                                content: reminder.message,
-                                allowedMentions: { parse: ['everyone'] }
+                                content: rosterContent,
+                                allowedMentions: { parse: ['everyone', 'roles'] }
                             });
                         } else {
                             // Enviar recordatorio normal con GIF
                             const randomPhrase = getRandomPhrase();
-                            let reminderMessage = `${randomPhrase}\n\n ${reminder.message} @everyone`;
+                            let reminderMessage = `${randomPhrase}\n\n ${reminder.message} ${roleToMention}`;
                             
-                            // Si hay un messageId, intentar obtener y mostrar el mensaje original
                             if (reminder.messageId) {
                                 try {
                                     const originalMessage = await channel.messages.fetch(reminder.messageId);
                                     if (originalMessage) {
-                                        // Eliminar @everyone del mensaje original
-                                        const cleanContent = originalMessage.content.replace(/@everyone\s*/i, '');
+                                        const cleanContent = originalMessage.content.replace(/(@everyone|<@&\d+>)\s*/gi, '').replace(/{{MENTION}}\s*/gi, '');
                                         reminderMessage += `\n\n**Roster:**\n${cleanContent || '*(mensaje sin contenido)*'}`;
                                     }
                                 } catch (error) {
@@ -72,15 +81,28 @@ setInterval(async () => {
                                 }
                             }
 
-                            // Añadir el enlace del GIF directamente en el contenido para que Discord lo incruste insertándolo al final
                             reminderMessage += `\n${getRandomGif()}`;
 
                             await channel.send({
-                                content: reminderMessage
+                                content: reminderMessage,
+                                allowedMentions: { parse: ['everyone', 'roles'] }
                             });
                         }
                     }
-                    await reminder.deleteOne();
+
+                    // Lógica de Repetición o Eliminación
+                    if (!reminder.recurrence || reminder.recurrence === 'none') {
+                        await reminder.deleteOne();
+                    } else {
+                        const nextDate = new Date(reminder.timestamp);
+                        if (reminder.recurrence === 'diario') {
+                            nextDate.setDate(nextDate.getDate() + 1);
+                        } else {
+                            nextDate.setDate(nextDate.getDate() + 7);
+                        }
+                        reminder.timestamp = nextDate;
+                        await reminder.save();
+                    }
                 } catch (err) {
                     console.error('Error procesando un recordatorio específico:', err);
                 }
